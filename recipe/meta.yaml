@@ -1,6 +1,6 @@
-{% set name = "freecad" %}
-{% set version = "0.22.pre" %}
-{% set build_number = 4 %}
+{% set name = "ondsel-es" %}
+{% set version = "2024.3.pre" %}
+{% set build_number = 31 %}
 {% set build_number = build_number + 500 %}  # [FEATURE_DEBUG]
 
 package:
@@ -8,21 +8,22 @@ package:
     version: {{ version }}
 
 source:
-    url: https://github.com/FreeCAD/FreeCAD-Bundle/releases/download/weekly-builds/freecad_source.tar.gz
+  - url: https://github.com/Ondsel-Development/FreeCAD/releases/download/weekly-builds/freecad_source.tar.gz
     fn: freecad_source_{{ build_number }}.tar.gz
     # sha256:
     patches:
-        - patches/disable_git_info.patch
-        - patches/qtwebengine_disable_sandbox.patch  # [linux]
         - patches/osx_arm64_cross_compiling.patch    # [build_platform != target_platform and osx]
+  - path: ./branding
+    folder: branding
 
 build:
     number: {{ build_number }}
-    skip: true  # [py != 310]
+    skip: true  # [py != 311]
 
 requirements:
     build:
         - {{ compiler("cxx") }}
+        - {{ stdlib("c") }}
         - {{ cdt('mesa-libgl-devel') }}      # [linux]
         - {{ cdt('mesa-dri-drivers') }}      # [linux]
         - {{ cdt('mesa-libegl-devel') }}     # [linux]
@@ -45,14 +46,13 @@ requirements:
         - libboost-devel
         - python
         - qt-main
-        - qt-webengine
-        - occt ==7.6.3
+        - occt
         - xerces-c
         - zlib
         - vtk
         - eigen
         - pybind11
-        - coin3d==4.0.0
+        - coin3d
         - pyside2
         - smesh
         - doxygen  # [build_platform == target_platform]
@@ -64,16 +64,16 @@ requirements:
         - ply
         - matplotlib-base
         - yaml-cpp
+        - pivy
     run:
         - pyside2
         - vtk
         - {{ pin_compatible('occt', max_pin='x.x.x') }}
-        - qt
         - xerces-c
         - zlib
         - hdf5
         - python
-        - coin3d==4.0.0
+        - coin3d
         - pivy
         - {{ pin_compatible('smesh', max_pin='x.x.x') }}
         - freetype
@@ -86,32 +86,26 @@ requirements:
         - gmsh
         - graphviz
     run_constrained:
-        - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("11.0") }}   # [osx and arm64]
-        - __osx >={{ MACOSX_DEPLOYMENT_TARGET|default("10.13") }}  # [osx and x86_64]
+        - {{ stdlib("c") }}
 
 
 about:
-    home: https://www.freecad.org/
+    home: https://ondsel.com/
     license: LGPL-2.1-or-later
     license_family: LGPL
     license_file: LICENSE
-    summary: 'FreeCAD is a parametric 3D modeler made primarily to design real-life objects of any size. '
+    summary: 'Ondsel is a parametric 3D modeler made primarily to design real-life objects of any size. '
     description: |
-        FreeCAD is a general purpose feature-based, parametric 3D modeler for
+        Ondsel is a general purpose feature-based, parametric 3D modeler for
         CAD, MCAD, CAx, CAE and PLM, aimed directly at mechanical engineering
         and product design but also fits a wider range of uses in engineering,
         such as architecture or other engineering specialties. It is 100% Open
         Source (LGPL2+ license) and extremely modular, allowing for very
         advanced extension and customization.
-        FreeCAD is based on OpenCASCADE, a powerful geometry kernel, features an
-        Open Inventor-compliant 3D scene representation model provided by the
-        Coin 3D library, and a broad Python API. The interface is built with Qt.
-        FreeCAD runs exactly the same way on Windows, Mac OSX, BSD and Linux
-        platforms.
+        Ondsel is based on FreeCAD, a free and open source project.
     doc_url: https://wiki.freecad.org/Main_Page
-    dev_url: https://github.com/FreeCAD/FreeCAD
+    dev_url: https://github.com/Ondsel-Development/FreeCAD
 
 extra:
     recipe-maintainers:
-        - looooo
         - adrianinsaval

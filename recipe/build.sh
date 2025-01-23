@@ -3,8 +3,10 @@ cd build
 
 if [[ ${FEATURE_DEBUG} = 1 ]]; then
       BUILD_TYPE="Debug"
+      DEV_TESTS="ON"
 else
       BUILD_TYPE="Release"
+      DEV_TESTS="OFF"
 fi
 
 declare -a CMAKE_PLATFORM_FLAGS
@@ -64,10 +66,22 @@ cmake -G "Ninja" \
       -D FREECAD_USE_PCL:BOOL=ON \
       -D FREECAD_USE_PCH:BOOL=OFF \
       -D INSTALL_TO_SITEPACKAGES:BOOL=ON \
+      -D ENABLE_DEVELOPER_TESTS:BOOL="${DEV_TESTS}" \
       ${CMAKE_PLATFORM_FLAGS[@]} \
       ..
 
 ninja install
 rm -r ${PREFIX}/share/doc/FreeCAD     # smaller size of package!
-mv ${PREFIX}/bin/FreeCAD ${PREFIX}/bin/freecad
-mv ${PREFIX}/bin/FreeCADCmd ${PREFIX}/bin/freecadcmd
+mv ${PREFIX}/bin/FreeCAD ${PREFIX}/bin/ondsel-es
+mv ${PREFIX}/bin/FreeCADCmd ${PREFIX}/bin/ondsel-escmd
+ln -s ondsel-es ${PREFIX}/bin/freecad
+ln -s ondsel-escmd ${PREFIX}/bin/freecadcmd
+
+# Ondsel branding
+if [[ ${HOST} =~ .*linux.* ]]; then
+  mv ../branding/com.ondsel.ES.desktop "${PREFIX}/share/applications/"
+  cp ../branding/Ondsel.svg "${PREFIX}/share/icons/hicolor/scalable/apps/"
+  rm ${PREFIX}/share/applications/org.freecad.FreeCAD.desktop
+fi
+mv ../branding/branding.xml "${PREFIX}/bin/"
+mv ../branding "${PREFIX}/share/Gui/Ondsel/"
